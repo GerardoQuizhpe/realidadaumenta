@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RA</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <h1 class="center">Realidad AR</h1>
+    <!-- Escena de A-Frame con AR.js -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+        <!-- Marcador de Hiro -->
+        <a-marker preset="hiro">
+            <!-- Cubo 3D 
+            <a-plane id="image" position="0 0 0" rotation="-90 0 0" widht="2.25" material="shader:flat; scale:2 2 2; src:tierra.jpg"></a-plane>           	
+            <a-entity gltf-model="src: url(adamHead/adamHead.gltf)"></a-entity> -->
+	        <a-box position="0 0.5 0" material="color: blue;"></a-box>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
+</body>
+</html>

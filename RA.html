@@ -6,7 +6,6 @@
     <title>RA</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <h1 class="center">Realidad AR</h1>
@@ -15,32 +14,9 @@
         <!-- Marcador de Hiro -->
         <a-marker preset="hiro">
 		<!-- <a-plane id="image" position="0 0 0" rotation="-90 0 0" widht="2.25" material="shader:flat; scale:1 1 1; src:imagen/tierra.jpg"></a-plane> -->
-		<a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.5 0.5 0.5" gesture-detector
-                draggable></a-entity>
+		<a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.5 0.5 0.5"></a-entity>
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
-    <script>
-        AFRAME.registerComponent('draggable', {
-            init: function () {
-                this.el.addEventListener('dragstart', function (evt) {
-                    console.log('Drag Start:', evt);
-                });
-                this.el.addEventListener('dragmove', function (evt) {
-                    const { dx, dy } = evt.detail;
-                    const position = this.getAttribute('position');
-                    this.setAttribute('position', {
-                        x: position.x + dx,
-                        y: position.y + dy,
-                        z: position.z,
-                    });
-                });
-                this.el.addEventListener('dragend', function (evt) {
-                    console.log('Drag End:', evt);
-                });
-            },
-        });
-    </script>
-
 </body>
 </html>

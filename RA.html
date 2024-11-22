@@ -10,7 +10,7 @@
 <body style="margin: 0; overflow: hidden;">
     <h1 class="center">Realidad AR</h1>
     <!-- Escena de A-Frame con AR.js -->
-    <a-scene embedded arjs="debugUIEnabled: false;">
+    <a-scene embedded arjs="debugUIEnabled: false; sourceType: webcam; detectionMode: mono_and_matrix; sourceWidth: 640; sourceHeight: 480;">
 	<!-- Cámara con lógica personalizada 
     	<a-camera position="0 0 0"></a-camera> -->
         <!-- Marcador de Hiro -->
@@ -18,7 +18,7 @@
 		<!-- <a-plane id="image" position="0 0 0" rotation="-90 0 0" widht="2.25" material="shader:flat; scale:1 1 1; src:imagen/tierra.jpg"></a-plane> -->
 		    <a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.3 0.3 0.3" position="0 0.5 0"></a-entity>
         </a-marker>
-        <a-entity camera="near: 0.1; far: 1000"></a-entity>
+        <a-entity camera="fov: 100; near: 0.1; far: 1000"></a-entity>
 	<!-- <script>
         // Acceso a la cámara A-Frame
         const cameraEl = document.querySelector('a-camera');

@@ -6,31 +6,43 @@
     <title>Realidad Aumentada </title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+    </style>
 </head>
-<body style="margin: 0px; overflow: hidden;">
+<body>
+    <h1 style="position: absolute; color: white; z-index: 1;">Realidad AR</h1>
     <a-scene embedded arjs="debugUIEnabled: false;">
         <!-- Marcador personalizado -->
 
         <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (1).patt">
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/Webcam.glb"
-                scale="1 1 1"
-                position="0 0 0">
+                scale="0.5 0.5 0.5"
+                position="0 0.5 0">
             </a-entity>
         </a-marker>
         
         <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr1730836015762.patt">
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/Security Camera.glb"
-                scale="0.3 0.3 0.3"
-                position="0 0 0">
+                scale="0.1 0.1 0.1"
+                position="0 0.5 0">
             </a-entity>
         </a-marker>
 
         <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (2).patt">
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/mosca/scene.gltf"
-                scale="0.3 0.3 0.3"
+                scale="0.05 0.05 0.05"
                 position="0 0.5 0">
             </a-entity>
         </a-marker>
@@ -38,37 +50,46 @@
         <a-entity camera></a-entity>
     </a-scene>
 
-  <script>
-    // Detectar si el usuario está en un dispositivo Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const scene = document.querySelector("a-scene");
 
-    if (isAndroid) {
-      console.log("Aplicando ajustes específicos para Android");
+            // Ajustar configuración de video para todos los navegadores
+            scene.addEventListener("loaded", () => {
+                const videoElement = document.querySelector("video");
+                if (videoElement) {
+                    videoElement.style.objectFit = "cover"; // Asegurar que el video llene el espacio correctamente
+                }
+            });
 
-      // Sobrescribir la configuración de la cámara con una resolución personalizada
-      let arToolkitSource = document.querySelector('a-scene').components['arjs'].arToolkitSource;
-      
-      // Sobrescribimos la función de inicialización de la cámara
-      arToolkitSource.initSource = function () {
-        navigator.mediaDevices
-          .getUserMedia({
-            video: {
-              facingMode: { exact: "environment" }, // Usa la cámara trasera
-              width: { ideal: 1280 }, // Resolución ideal
-              height: { ideal: 720 }
+            if (isAndroid) {
+                console.log("Configurando cámara para Android...");
+                
+                scene.addEventListener("loaded", () => {
+                    // Acceder al sistema de AR.js
+                    const arjsSystem = scene.systems["arjs"];
+                    if (arjsSystem && arjsSystem._arSession) {
+                        const session = arjsSystem._arSession;
+
+                        // Forzar resolución y evitar zoom incorrecto
+                        session.videoWidth = 1280; 
+                        session.videoHeight = 720;
+                        session.displayWidth = 1280;
+                        session.displayHeight = 720;
+
+                        // Verificar y ajustar el zoom inicial
+                        const video = arjsSystem.arSource.domElement;
+                        if (video) {
+                            video.style.objectFit = "cover";
+                            video.style.transform = "scale(1)"; // Elimina zoom inicial
+                        }
+
+                        console.log("Resolución ajustada para Android.");
+                    }
+                });
             }
-          })
-          .then((stream) => {
-            arToolkitSource.domElement.srcObject = stream;
-            arToolkitSource.domElement.play();
-          })
-          .catch((error) => {
-            console.error("Error al acceder a la cámara:", error);
-          });
-      };
-
-      // Inicializamos el AR.js con los cambios
-      arToolkitSource.initSource();
-    }
+        });
+    </script>
 </body>
 </html>

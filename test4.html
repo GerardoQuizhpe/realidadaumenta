@@ -8,7 +8,7 @@
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin: 0px; overflow: hidden;">
-    <a-scene embedded arjs="debugUIEnabled: false;">
+    <a-scene embedded arjs="sourceType: webcam; cameraParametersUrl: camera_para.dat;">
         <!-- Cámara con lógica personalizada 
       <a-camera position="0 1.6 0"></a-camera>
         Marcador personalizado -->
@@ -55,9 +55,7 @@
             </a-entity>
         </a-marker>
 
-        <a-entity camera look-controls>
-            <a-camera fov="80"></a-camera>
-        </a-entity>
+        <a-entity camera></a-entity>
     </a-scene>
 </body>
 </html>

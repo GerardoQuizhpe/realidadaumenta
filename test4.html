@@ -4,21 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realidad Aumentada </title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://rawgit.com/jeromeetienne/ar.js/2.2.0/aframe/build/aframe-ar.min.js"></script>
 </head>
 <body style="margin: 0px; overflow: hidden;">
-    <a-scene embedded arjs>
+    <a-scene embedded arjs="debugUIEnabled: false;">
         <!-- Marcador personalizado -->
-        <a-marker type="pattern" url="/patrones/pattern-hiro.patt">
-            <!-- Mostrar imagen"-->
-            <a-image
-                src="https://t3.ftcdn.net/jpg/05/43/06/00/240_F_543060065_aUnJHSkTRLqGRqbNis0MFld1U80FXTN9.jpg"
-                position="0 0 0"
-                rotation="-90 0 0"
-                scale="1.25 1.25 1.25">
-            </a-image>  
-        </a-marker>
 
         <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (1).patt">
             <a-entity 

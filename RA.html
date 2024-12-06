@@ -2,47 +2,56 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RA</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/ar.js@2.2.1/aframe/build/aframe-ar.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
-    <h1 class="center">Realidad AR</h1>
     <!-- Escena de A-Frame con AR.js -->
     <a-scene embedded arjs="debugUIEnabled: false;">
         <!-- Marcador de Hiro -->
         <a-marker preset="hiro">
-            <a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.3 0.3 0.3" position="0 0.5 0"></a-entity>
+            <a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.2 0.2 0.2" position="0 0.5 0"></a-entity>
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const isAndroid = /Android/i.test(navigator.userAgent);
-        const scene = document.querySelector("a-scene");
-
-        if (isAndroid) {
-          console.log("Configurando cámara para Android...");
-          
-          scene.addEventListener("loaded", () => {
-            const arjsSystem = scene.systems["arjs"];
+        document.addEventListener("DOMContentLoaded", () => {
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             
-            // Modificar configuración de la cámara AR.js
-            if (arjsSystem && arjsSystem._arSession) {
-              const session = arjsSystem._arSession;
-              
-              session.videoWidth = 1280; // Ancho ideal
-              session.videoHeight = 720; // Alto ideal
-              session.displayWidth = 1280;
-              session.displayHeight = 720;
+            console.log("Dispositivo detectado:", isAndroid ? "Android" : isIOS ? "iOS" : "Otro");
 
-              console.log("Resolución ajustada para Android.");
+            // Ajustar comportamiento solo en Android
+            if (isAndroid) {
+                const scene = document.querySelector("a-scene");
+
+                scene.addEventListener("loaded", () => {
+                    const arjsSystem = scene.systems["arjs"];
+                    
+                    if (arjsSystem && arjsSystem._arSession) {
+                        const session = arjsSystem._arSession;
+
+                        // Sobrescribir dimensiones del video para evitar zoom
+                        session.videoWidth = 1280; // Ancho ideal
+                        session.videoHeight = 720; // Alto ideal
+                        session.displayWidth = 1280;
+                        session.displayHeight = 720;
+
+                        console.log("Configuración de cámara ajustada para Android.");
+                    }
+
+                    // Forzar reinicio de la cámara para asegurarse de que no haya zoom
+                    const videoElement = arjsSystem && arjsSystem._arSession && arjsSystem._arSession.arController.video;
+                    if (videoElement) {
+                        videoElement.style.objectFit = "cover";
+                        videoElement.style.transform = "scale(1)";
+                    }
+                });
             }
-          });
-        }
-      });
+        });
     </script>
 </body>
 </html>

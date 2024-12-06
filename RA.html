@@ -11,54 +11,38 @@
     <h1 class="center">Realidad AR</h1>
     <!-- Escena de A-Frame con AR.js -->
     <a-scene embedded arjs="debugUIEnabled: false;">
-	<!-- Cámara con lógica personalizada 
-    	<a-camera position="0 0 0"></a-camera> -->
         <!-- Marcador de Hiro -->
         <a-marker preset="hiro">
-		<!-- <a-plane id="image" position="0 0 0" rotation="-90 0 0" widht="2.25" material="shader:flat; scale:1 1 1; src:imagen/tierra.jpg"></a-plane> -->
-		    <a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.3 0.3 0.3" position="0 0.5 0"></a-entity>
+            <a-entity gltf-model="src: url(mosca/scene.gltf)" scale="0.3 0.3 0.3" position="0 0.5 0"></a-entity>
         </a-marker>
         <a-entity camera></a-entity>
     </a-scene>
-  <script>
-    // Detectar si el usuario está en un dispositivo Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
 
-    if (isAndroid) {
-      console.log("Configurando cámara para Android");
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const scene = document.querySelector("a-scene");
 
-      // Sobrescribir la cámara del componente de A-Frame
-      const scene = document.querySelector('a-scene');
-      
-      scene.addEventListener('loaded', () => {
-        // Configuramos manualmente la cámara al inicializar
-        navigator.mediaDevices
-          .getUserMedia({
-            video: {
-              facingMode: { exact: "environment" }, // Cámara trasera
-              width: { ideal: 1280 }, // Resolución ideal
-              height: { ideal: 720 },
+        if (isAndroid) {
+          console.log("Configurando cámara para Android...");
+          
+          scene.addEventListener("loaded", () => {
+            const arjsSystem = scene.systems["arjs"];
+            
+            // Modificar configuración de la cámara AR.js
+            if (arjsSystem && arjsSystem._arSession) {
+              const session = arjsSystem._arSession;
+              
+              session.videoWidth = 1280; // Ancho ideal
+              session.videoHeight = 720; // Alto ideal
+              session.displayWidth = 1280;
+              session.displayHeight = 720;
+
+              console.log("Resolución ajustada para Android.");
             }
-          })
-          .then((stream) => {
-            const video = document.createElement('video');
-            video.srcObject = stream;
-            video.play();
-
-            // Vincular el video a la textura de la cámara
-            const cameraEntity = document.querySelector('a-entity[camera]');
-            if (cameraEntity) {
-              cameraEntity.setAttribute('material', {
-                shader: 'video',
-                src: video,
-              });
-            }
-          })
-          .catch((err) => {
-            console.error("Error al acceder a la cámara:", err);
           });
+        }
       });
-    }
-  </script>
+    </script>
 </body>
 </html>

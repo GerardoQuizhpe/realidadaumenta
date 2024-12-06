@@ -6,21 +6,9 @@
     <title>Realidad Aumentada </title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
-    <script>
-        AFRAME.registerComponent('fix-android-zoom', {
-        init: function () {
-        const sceneEl = this.el.sceneEl;
-        if (/Android/i.test(navigator.userAgent)) {
-          console.log("Aplicando ajustes dinámicos para Android");
-          sceneEl.renderer.setPixelRatio(window.devicePixelRatio);
-          sceneEl.renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-      }
-    });
-    </script>
 </head>
 <body style="margin: 0px; overflow: hidden;">
-    <a-scene embedded arjs fix-android-zoom>
+    <a-scene embedded arjs>
         <!-- Marcador personalizado -->
         <a-marker type="pattern" url="/patrones/pattern-hiro.patt">
             <!-- Mostrar imagen"-->
@@ -57,5 +45,39 @@
 
         <a-entity camera></a-entity>
     </a-scene>
+
+      <script>
+    // Detectar si el usuario está en un dispositivo Android
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+      console.log("Aplicando ajustes específicos para Android");
+
+      // Sobrescribir la configuración de la cámara con una resolución personalizada
+      let arToolkitSource = document.querySelector('a-scene').components['arjs'].arToolkitSource;
+      
+      // Sobrescribimos la función de inicialización de la cámara
+      arToolkitSource.initSource = function () {
+        navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              facingMode: { exact: "environment" }, // Usa la cámara trasera
+              width: { ideal: 1280 }, // Resolución ideal
+              height: { ideal: 720 }
+            }
+          })
+          .then((stream) => {
+            arToolkitSource.domElement.srcObject = stream;
+            arToolkitSource.domElement.play();
+          })
+          .catch((error) => {
+            console.error("Error al acceder a la cámara:", error);
+          });
+      };
+
+      // Inicializamos el AR.js con los cambios
+      arToolkitSource.initSource();
+    }
+  </script>
 </body>
 </html>

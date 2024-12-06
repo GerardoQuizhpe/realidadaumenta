@@ -55,16 +55,9 @@
             </a-entity>
         </a-marker>
 
-        <a-entity camera></a-entity>
-
-        <!-- <script>
-            // Acceso a la cámara A-Frame
-            const cameraEl = document.querySelector('a-camera');
-            // Puedes agregar eventos personalizados aquí
-            cameraEl.addEventListener('loaded', () => {
-              console.log('Cámara cargada en la escena');
-            });
-          </script> -->
+        <a-entity camera look-controls>
+            <a-camera fov="80"></a-camera>
+        </a-entity>
     </a-scene>
 </body>
 </html>

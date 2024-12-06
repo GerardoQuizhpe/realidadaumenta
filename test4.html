@@ -6,9 +6,17 @@
     <title>Realidad Aumentada </title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+    <script>
+        if (/Android/i.test(navigator.userAgent)) {
+          console.log("Ajustando resolución del renderer para Android");
+          const sceneEl = document.querySelector('a-scene');
+          sceneEl.renderer.setPixelRatio(window.devicePixelRatio);
+          sceneEl.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+    </script>
 </head>
 <body style="margin: 0px; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam; cameraParametersUrl: camera_para.dat;">
+    <a-scene embedded arjs>
         <!-- Cámara con lógica personalizada 
       <a-camera position="0 1.6 0"></a-camera>
         Marcador personalizado -->

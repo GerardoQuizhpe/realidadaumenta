@@ -7,19 +7,21 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
     <script>
+        AFRAME.registerComponent('fix-android-zoom', {
+        init: function () {
+        const sceneEl = this.el.sceneEl;
         if (/Android/i.test(navigator.userAgent)) {
-          console.log("Ajustando resolución del renderer para Android");
-          const sceneEl = document.querySelector('a-scene');
+          console.log("Aplicando ajustes dinámicos para Android");
           sceneEl.renderer.setPixelRatio(window.devicePixelRatio);
           sceneEl.renderer.setSize(window.innerWidth, window.innerHeight);
         }
+      }
+    });
     </script>
 </head>
 <body style="margin: 0px; overflow: hidden;">
-    <a-scene embedded arjs>
-        <!-- Cámara con lógica personalizada 
-      <a-camera position="0 1.6 0"></a-camera>
-        Marcador personalizado -->
+    <a-scene embedded arjs fix-android-zoom>
+        <!-- Marcador personalizado -->
         <a-marker type="pattern" url="/patrones/pattern-hiro.patt">
             <!-- Mostrar imagen"-->
             <a-image
@@ -31,11 +33,6 @@
         </a-marker>
 
         <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (1).patt">
-            <!-- Modelo 3D 
-            gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/virtualcity/VC.gltf"
-            scale="0.005 0.005 0.005" 
-            https://gerardoquizhpe.github.io/modelos3d/Webcam.glb 
-            https://raw.githubusercontent.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-playground/models/CesiumMan.gltf-->
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/Webcam.glb"
                 scale="1 1 1">
@@ -43,11 +40,6 @@
         </a-marker>
         
         <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr1730836015762.patt">
-            <!-- Modelo 3D 
-            gltf-model="https://cdn.aframe.io/test-models/models/glTF-2.0/virtualcity/VC.gltf"
-            scale="0.005 0.005 0.005" 
-            https://threejs.org/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf
-            https://raw.githubusercontent.com/nicolocarpignoli/nicolocarpignoli.github.io/master/ar-playground/models/CesiumMan.gltf-->
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/Security Camera.glb"
                 scale="0.3 0.3 0.3"

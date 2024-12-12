@@ -2,57 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Realidad Aumentada </title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: black;
-        }
-    </style>
-</head>
-<body>
-    <!--<h1 style="position: absolute; color: white; z-index: 1;">Realidad AR</h1>-->
-    <a-scene embedded arjs="debugUIEnabled: false;">
-        <!-- Marcador personalizado -->
-
-        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (1).patt">
-            <a-entity 
-                gltf-model="https://gerardoquizhpe.github.io/modelos3d/Webcam.glb"
-                scale="0.5 0.5 0.5"
-                position="0 0.5 0"
-                interaction-handler>
-            </a-entity>
-        </a-marker>
-        
-        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr1730836015762.patt">
-            <a-entity 
-                gltf-model="https://gerardoquizhpe.github.io/modelos3d/Security Camera.glb"
-                scale="0.1 0.1 0.1"
-                position="0 0.5 0"
-                interaction-handler>
-            </a-entity>
-        </a-marker>
-
-        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (2).patt">
-            <a-entity 
-                gltf-model="https://gerardoquizhpe.github.io/modelos3d/mosca/scene.gltf"
-                scale="0.05 0.05 0.05"
-                position="0 0.5 0"
-                interaction-handler>
-            </a-entity>
-        </a-marker>
-
-        <a-entity camera></a-entity>
-    </a-scene>
-
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const isAndroid = /Android/i.test(navigator.userAgent);
@@ -193,5 +146,43 @@
             }
         });
     </script>
+</head>
+<body style="margin: 0px; overflow: hidden;">
+    <!--<h1 style="position: absolute; color: white; z-index: 1;">Realidad AR</h1>-->
+    <a-scene embedded arjs="debugUIEnabled: false;">
+        <!-- Marcador personalizado -->
+
+        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (1).patt">
+            <a-entity 
+                gltf-model="https://gerardoquizhpe.github.io/modelos3d/Webcam.glb"
+                scale="0.5 0.5 0.5"
+                position="0 0 0"
+                rotatio="0 0 0"
+                interaction-handler>
+            </a-entity>
+        </a-marker>
+        
+        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr1730836015762.patt">
+            <a-entity 
+                gltf-model="https://gerardoquizhpe.github.io/modelos3d/Security Camera.glb"
+                scale="0.1 0.1 0.1"
+                position="0 0 0"
+                rotatio="0 0 0"
+                interaction-handler>
+            </a-entity>
+        </a-marker>
+
+        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (2).patt">
+            <a-entity 
+                gltf-model="https://gerardoquizhpe.github.io/modelos3d/mosca/scene.gltf"
+                scale="0.05 0.05 0.05"
+                position="0 0 0"
+                rotatio="0 0 0"
+                interaction-handler>
+            </a-entity>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
 </html>

@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <h1 style="position: absolute; color: white; z-index: 1;">Realidad AR</h1>
+    <!--<h1 style="position: absolute; color: white; z-index: 1;">Realidad AR</h1>-->
     <a-scene embedded arjs="debugUIEnabled: false;">
         <!-- Marcador personalizado -->
 
@@ -27,7 +27,8 @@
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/Webcam.glb"
                 scale="0.5 0.5 0.5"
-                position="0 0.5 0">
+                position="0 0.5 0"
+                interaction-handler>
             </a-entity>
         </a-marker>
         
@@ -35,7 +36,8 @@
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/Security Camera.glb"
                 scale="0.1 0.1 0.1"
-                position="0 0.5 0">
+                position="0 0.5 0"
+                interaction-handler>
             </a-entity>
         </a-marker>
 
@@ -43,7 +45,8 @@
             <a-entity 
                 gltf-model="https://gerardoquizhpe.github.io/modelos3d/mosca/scene.gltf"
                 scale="0.05 0.05 0.05"
-                position="0 0.5 0">
+                position="0 0.5 0"
+                interaction-handler>
             </a-entity>
         </a-marker>
 
@@ -88,6 +91,105 @@
                         console.log("Resolución ajustada para Android.");
                     }
                 });
+            }
+        });
+
+        // Agregar un nuevo componente para girar y hacer zoom
+        AFRAME.registerComponent('interaction-handler', {
+            // Definir las propiedades configurables del esquema
+            schema: {
+                rotationSpeed: { type: 'number', default: 0.5 }, // Velocidad de rotación por defecto
+                zoomSpeed: { type: 'number', default: 0.1 }, // Velocidad de zoom por defecto
+                minScale: { type: 'number', default: 0.1 }, // Escala mínima del modelo 3D
+                maxScale: { type: 'number', default: 5 } // Escala máxima del modelo 3D
+            },
+            //Inicialización del componente
+            init: function () {
+                // Estado inicial de los eventos de interacción
+                this.state = { rotating: false, zooming: false, prevPos: {}, initDist: 0, scale: this.data.minScale };
+                
+                // Vincular eventos de la escena a sus correspondientes manejadores 
+                this.bindEvents();
+            },
+            // Asignar eventos a la escena
+            bindEvents: function () {
+                const sceneEl = this.el.sceneEl;
+                const events = {
+                    mousemove: e => this.handleInteraction(e.clientX, e.clientY, 'rotate'), // Manejar rotación con el mouse
+                    mousedown: e => this.setState('rotating', { x: e.clientX, y: e.clientY }), // Iniciar rotación con el mouse
+                    mouseup: () => this.resetState(), // Finalizar rotación
+                    touchstart: e => this.handleTouchStart(e), // Manejar inicio de toques
+                    touchmove: e => this.handleTouchMove(e), // Manejar movimientos táctiles
+                    touchend: () => this.resetState(), // Reiniciar estados al soltar los toques
+                    wheel: e => this.zoom(e.deltaY * -1) // Manejar zoom con la rueda del mouse
+                };
+                // Asociar los eventos a la escena
+                Object.entries(events).forEach(([type, handler]) => sceneEl.addEventListener(type, handler));
+            },
+            // Cambiar el estado especificado con el valor dado
+            setState: function (key, value) {
+                // Si el valor recibido es un objeto, asignar las coordenadas de la posición previa
+                if (typeof value === 'object') this.state.prevPos = value;
+                this.state[key] = !!value; // Convertir valor a booleano y actualizar estado
+            },
+            // Reiniciar los estados de interacción al finalizar
+            resetState: function () {
+                this.setState('rotating', false); // Desactivar modo de rotación
+                this.setState('zooming', false); // Desactivar modo de zoom
+            },
+            // Manejar interacción de rotación
+            handleInteraction: function (x, y, mode) {
+                // Salir si no está en modo rotación y el modo es 'rotate'
+                if (!this.state.rotating && mode === 'rotate') return;
+                
+                const { x: prevX, y: prevY } = this.state.prevPos; // Obtener posición previa
+                const rotation = this.el.getAttribute('rotation'); // Obtener la rotación actual del elemento
+        
+                // Calcular la nueva rotación y aplicarlo al modelo 3D
+                this.el.setAttribute('rotation', {
+                    x: rotation.x - (y - prevY) * this.data.rotationSpeed, // Rotación en X
+                    y: rotation.y + (x - prevX) * this.data.rotationSpeed, // Rotación en Y
+                    z: 0 // Rotación en Z fija
+                });
+                this.state.prevPos = { x, y }; // Actualizar la posición previa
+            },
+            // Función para realizar zoom en el modelo 3D
+            zoom: function (delta) {
+                // Calcular el nuevo tamaño del modelo respetando los límites establecidos
+                const newScale = Math.min(
+                    Math.max(this.state.scale + delta * this.data.zoomSpeed, this.data.minScale),
+                    this.data.maxScale
+                );
+                if (newScale !== this.state.scale) { // Si la escala cambia, se actualiza
+                    this.state.scale = newScale; // Guardar la nueva escala (tamaño)
+                    this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`); // Aplicar escala
+                }
+            },
+            // Manejar el inicio de interacciones táctiles (rotación o zoom)
+            handleTouchStart: function (e) {
+                // Un dedo: modo rotación
+                if (e.touches.length === 1) this.setState('rotating', { x: e.touches[0].clientX, y: e.touches[0].clientY });
+                // Dos dedos: modo zoom
+                else if (e.touches.length === 2) {
+                    this.state.zooming = true; // Activar el modo zoom
+                    this.state.initDist = this.getTouchDistance(e.touches); // Calcular la distancia inicial del modelo 3D
+                }
+            },
+            // Manejar movimientos táctiles (rotación o zoom)
+            handleTouchMove: function (e) {
+                // Un dedo: rotación
+                if (e.touches.length === 1) this.handleInteraction(e.touches[0].clientX, e.touches[0].clientY, 'rotate');
+                // Dos dedos: zoom
+                else if (e.touches.length === 2 && this.state.zooming) {
+                    const dist = this.getTouchDistance(e.touches); // Calcular la nueva distancia entre dedos
+                    this.zoom((dist - this.state.initDist) * this.data.zoomSpeed); // Ajustar el zoom
+                    this.state.initDist = dist; // Actualizar la distancia inicial
+                }
+            },
+            // Calcular la distancia entre dos puntos de contacto
+            getTouchDistance: function (touches) {
+                const [t1, t2] = touches; // Obtener las dos posiciones táctiles
+                return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY); // Calcular la distancia entre las posiciones táctiles
             }
         });
     </script>

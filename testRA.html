@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Realidad Aumentada</title>
+    <!-- Importa bibliotecas A-Frame para crear escenas en realidad aumentada y habilitar-->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.1.7/aframe/build/aframe-ar.js"></script>
+    <!-- Importar metodo JavaScript para manejar interacciones personalizadas -->
+    <script src="metodos.js"></script>        
+</head>
+<!-- Configurar pagina que no tenga márgenes y ocultar desbordamientos de contenido -->
+<body style="margin: 0px; overflow: hidden;">
+    <!-- Configurar la escena de realidad aumentada y desactivar depuración de AR.js -->
+    <a-scene embedded arjs="debugUIEnabled: false;">
+        <!-- Marcadores personalizados .patt -->
+
+        <!-- Especificar marcador personalizado y url del mismo-->
+        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (2).patt">
+            <!-- Ajustar tamaño del modelo, establecer posición, rotar imagen y componente para interacciones -->
+            <a-entity
+                gltf-model="https://gerardoquizhpe.github.io/modelos3d/mosca/scene.gltf"
+                scale="0.3 0.3 0.3"
+                position="0 0.5 0"
+                rotation="0 0 0"
+                interaction-handler>
+            </a-entity>
+        </a-marker>
+        
+        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr-code (1).patt">
+            <!-- https://gerardoquizhpe.github.io/modelos3d/Webcam.glb -->
+            <a-entity 
+                gltf-model="https://raw.githubusercontent.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
+                scale="0.03 0.03 0.03"
+                position="0 0.5 0"
+                rotation="-90 0 0"
+                interaction-handler>
+            </a-entity>
+        </a-marker>
+    
+        <a-marker type="pattern" url="https://gerardoquizhpe.github.io/modelos3d/pattern-qr1730836015762.patt">            
+            <a-entity 
+                gltf-model="https://gerardoquizhpe.github.io/modelos3d/cpu.glb"                 
+                scale="0.1 0.1 0.1" 
+                position="0 0.5 0" 
+                rotation="-90 0 0"
+                interaction-handler>             
+            </a-entity>         
+        </a-marker>
+
+        <!-- Capturar patrones y mostrar los modelos en realidad aumentada -->
+        <a-entity camera></a-entity>
+    </a-scene>
+</body>
+</html>

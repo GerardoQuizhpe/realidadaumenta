@@ -16,7 +16,7 @@ AFRAME.registerComponent('interaction-handler', {
             moving: false, 
             prevPos: {x: 0, y: 0}, 
             initDist: 0, 
-            scale: this.data.minScale, 
+            scale: this.data.minScale,
             lastClickTime: 0}; // Para detectar el doble click
         
         // Vincular eventos de la escena a sus correspondientes manejadores 

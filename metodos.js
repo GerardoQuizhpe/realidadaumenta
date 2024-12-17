@@ -71,6 +71,12 @@ AFRAME.registerComponent('interaction-handler', {
         } else if (e.touches.length === 2) {
             this.state.zooming = true;
             this.state.initDist = this.getTouchDistance(e.touches);
+        } else if (e.touches.length === 3) { // Tres dedos: modo movimiento
+            this.setState('moving', true);
+            this.state.prevPos = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
         }
     },
     handleTouchMove: function (e) {
@@ -80,7 +86,7 @@ AFRAME.registerComponent('interaction-handler', {
             const dist = this.getTouchDistance(e.touches);
             this.zoom((dist - this.state.initDist) * this.data.zoomSpeed);
             this.state.initDist = dist;
-        } else if (e.touches.length === 1 && this.state.moving) {
+        } else if (e.touches.length === 3 && this.state.moving) {
             this.move(e.touches[0].clientX, e.touches[0].clientY);
         }
     },

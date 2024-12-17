@@ -62,7 +62,7 @@ AFRAME.registerComponent('interaction-handler', {
     },
     // Manejar interacción de rotación o movimiento
     handleInteraction: function (x, y) {
-        if (this.state.rotating) this.rotate(x, y);
+        if (this.state.rotating) this.rotate(x, y); // Doble clic para rotar
         else if (this.state.moving) this.move(x, y);
     },
     // Función para rotar el modelo 3D
@@ -90,23 +90,22 @@ AFRAME.registerComponent('interaction-handler', {
     },
     // Manejar inicio de interacciones táctiles (rotación o zoom)
     handleTouchStart: function (e) {
-        if (e.touches.length === 1) { // Un dedo
+        if (e.touches.length === 1) { // Un dedo: modo rotación movimiento
             this.setState('moving', {x: e.touches[0].clientX, y: e.touches[0].clientY});
-            this.state.zooming = false;
-        } else if (e.touches.length === 2) { // Dos dedos
-            this.resetState(); // Asegúrate de que otros estados están apagados
-            this.state.zooming = true;
-            this.state.initDist = this.getTouchDistance(e.touches);
+        } else if (e.touches.length === 2) { // Dos dedos: modo zoom
+            this.state.zooming = true; // Activar el modo zoom
+            this.state.initDist = this.getTouchDistance(e.touches); // Calcular la distancia inicial del modelo 3D
         }
-    },    
+    },
     // Manejar movimientos táctiles (rotación, zoom o movimiento)
     handleTouchMove: function (e) {
+        // Un dedo: rotación o movimiento
         if (e.touches.length === 1 && this.state.moving) {
-            this.move(e.touches[0].clientX, e.touches[0].clientY);
-        } else if (e.touches.length === 2 && this.state.zooming) {
-            const dist = this.getTouchDistance(e.touches);
-            this.zoom((dist - this.state.initDist) * this.data.zoomSpeed);
-            this.state.initDist = dist;
+            this.rotate(e.touches[0].clientX, e.touches[0].clientY);
+        } else if (e.touches.length === 2 && this.state.zooming) { // Dos dedos: zoom
+            const dist = this.getTouchDistance(e.touches); // Calcular la nueva distancia entre dedos
+            this.zoom((dist - this.state.initDist) * this.data.zoomSpeed); // Ajustar el zoom
+            this.state.initDist = dist; // Actualizar la distancia inicial
         }
     },
     // Calcular la distancia entre los puntos de contacto

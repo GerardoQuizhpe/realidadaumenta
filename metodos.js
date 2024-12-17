@@ -1,4 +1,3 @@
-// Agregar un nuevo componente para girar y hacer zoom
 AFRAME.registerComponent('interaction-handler', {
     // Definir las propiedades configurables del esquema
     schema: {
@@ -49,20 +48,28 @@ AFRAME.registerComponent('interaction-handler', {
         Object.assign(this.state, {rotating: false, zooming: false, moving: false});
     },
     // Iniciar interacción según el modo (rotación o movimiento)
-    startInteraction: function (x, y) {
-        const currentTime = new Date().getTime();
-        const timeDifference = currentTime - this.state.lastClickTime;
-        this.state.lastClickTime = currentTime;
+    startInteraction: function (x, y, mode) {
+        if (mode === 'mouse') {
+            const currentTime = new Date().getTime();
+            const timeDifference = currentTime - this.state.lastClickTime;
+            this.state.lastClickTime = currentTime;
 
-        if (timeDifference < 300) {
-            this.setState('rotating', true); // Doble clic para rotar
-        } else {
-            this.setState('moving', {x, y}); // Click simple para mover
+            if (timeDifference < 300) {
+                this.setState('rotating', true); // Doble clic para rotar
+            } else {
+                this.setState('moving', {x, y}); // Click simple para mover
+            }
+        } else if (mode === 'touch') {
+            if (this.state.moving) {
+                this.setState('moving', {x: x.touches[0].clientX, y: x.touches[0].clientY});
+            } else if (this.state.zooming) {
+                this.state.initDist = this.getTouchDistance(x.touches); // Calcular la distancia inicial del modelo 3D
+            }
         }
     },
     // Manejar interacción de rotación o movimiento
     handleInteraction: function (x, y) {
-        if (this.state.rotating) this.rotate(x, y); // Doble clic para rotar
+        if (this.state.rotating) this.rotate(x, y);
         else if (this.state.moving) this.move(x, y);
     },
     // Función para rotar el modelo 3D
@@ -88,17 +95,6 @@ AFRAME.registerComponent('interaction-handler', {
         });
         this.state.prevPos = {x, y}; // Actualizar la posición previa
     },
-    // Función para realizar zoom del modelo 3D
-    zoom: function (delta) {
-        const newScale = Math.min(
-            Math.max(this.state.scale + delta * this.data.zoomSpeed, this.data.minScale),
-            this.data.maxScale
-        );
-        if (newScale !== this.state.scale) {
-            this.state.scale = newScale;
-            this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
-        }
-    },
     // Manejar inicio de interacciones táctiles (rotación o zoom)
     handleTouchStart: function (e) {
         if (e.touches.length === 1) { // Un dedo: modo rotación movimiento
@@ -112,7 +108,7 @@ AFRAME.registerComponent('interaction-handler', {
     handleTouchMove: function (e) {
         // Un dedo: rotación o movimiento
         if (e.touches.length === 1 && this.state.moving) {
-            this.rotate(e.touches[0].clientX, e.touches[0].clientY);
+            this.move(e.touches[0].clientX, e.touches[0].clientY);
         } else if (e.touches.length === 2 && this.state.zooming) { // Dos dedos: zoom
             const dist = this.getTouchDistance(e.touches); // Calcular la nueva distancia entre dedos
             this.zoom((dist - this.state.initDist) * this.data.zoomSpeed); // Ajustar el zoom
@@ -122,5 +118,16 @@ AFRAME.registerComponent('interaction-handler', {
     // Calcular la distancia entre los puntos de contacto
     getTouchDistance: function ([t1, t2]) {
         return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY); // Obtener las posiciones táctiles y calcular la distancia entre las posiciones
+    },
+    // Función para realizar zoom del modelo 3D
+    zoom: function (delta) {
+        const newScale = Math.min(
+            Math.max(this.state.scale + delta * this.data.zoomSpeed, this.data.minScale),
+            this.data.maxScale
+        );
+        if (newScale !== this.state.scale) {
+            this.state.scale = newScale;
+            this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
+        }
     }
 });

@@ -1,28 +1,27 @@
 AFRAME.registerComponent('interaction-handler', {
     schema: {
-        rotationSpeed: {type: 'number', default: 0.5},
-        zoomSpeed: {type: 'number', default: 0.001},
-        moveSpeed: {type: 'number', default: 0.01},
-        minScale: {type: 'number', default: 0.1},
-        maxScale: {type: 'number', default: 3}
+        rotationSpeed: { type: 'number', default: 0.5 },
+        zoomSpeed: { type: 'number', default: 0.1 },
+        moveSpeed: { type: 'number', default: 0.01 }, // Velocidad de movimiento adicional
+        minScale: { type: 'number', default: 0.1 },
+        maxScale: { type: 'number', default: 5 }
     },
     init: function () {
-        this.state = { 
-            rotating: false, 
-            zooming: false, 
-            moving: false, 
-            prevPos: {x: 0, y: 0}, 
-            initDist: 0, 
-            scale: this.data.minScale, 
-            lastClickTime: 0
+        this.state = {
+            rotating: false,
+            zooming: false,
+            moving: false,
+            prevPos: {},
+            initDist: 0,
+            scale: this.data.minScale
         };
         this.bindEvents();
     },
     bindEvents: function () {
         const sceneEl = this.el.sceneEl;
         const events = {
-            mousemove: e => this.handleInteraction(e.clientX, e.clientY),
-            mousedown: e => this.startInteraction(e.clientX, e.clientY, 'mouse'),
+            mousemove: e => this.handleInteraction(e.clientX, e.clientY, 'rotate'),
+            mousedown: e => this.setState('rotating', { x: e.clientX, y: e.clientY }),
             mouseup: () => this.resetState(),
             touchstart: e => this.handleTouchStart(e),
             touchmove: e => this.handleTouchMove(e),
@@ -36,62 +35,58 @@ AFRAME.registerComponent('interaction-handler', {
         this.state[key] = !!value;
     },
     resetState: function () {
-        Object.assign(this.state, {rotating: false, zooming: false, moving: false});
+        this.setState('rotating', false);
+        this.setState('zooming', false);
+        this.setState('moving', false);
     },
-    startInteraction: function (x, y) {
-        const currentTime = new Date().getTime();
-        const timeDifference = currentTime - this.state.lastClickTime;
-        this.state.lastClickTime = currentTime;
+    handleInteraction: function (x, y, mode) {
+        if (mode === 'rotate' && !this.state.rotating) return;
 
-        if (timeDifference < 300) {
-            this.setState('rotating', true); 
-        } else {
-            this.setState('moving', {x, y});
-        }
-    },
-    handleInteraction: function (x, y) {
-        if (this.state.rotating) this.rotate(x, y);
-        else if (this.state.moving) this.move(x, y);
-    },
-    rotate: function (x, y) {
-        const {x: prevX, y: prevY} = this.state.prevPos;
+        const { x: prevX, y: prevY } = this.state.prevPos;
         const rotation = this.el.getAttribute('rotation');
-        this.el.setAttribute('rotation', {
-            x: rotation.x - (y - prevY) * this.data.rotationSpeed,
-            y: rotation.y + (x - prevX) * this.data.rotationSpeed,
-            z: rotation.z
-        });
-        this.state.prevPos = {x, y};
+        if (this.state.rotating) {
+            this.el.setAttribute('rotation', {
+                x: rotation.x - (y - prevY) * this.data.rotationSpeed,
+                y: rotation.y + (x - prevX) * this.data.rotationSpeed,
+                z: rotation.z
+            });
+        } else if (this.state.moving) {
+            this.move(x, y);
+        }
+        this.state.prevPos = { x, y };
     },
     move: function (x, y) {
-        const {x: prevX, y: prevY} = this.state.prevPos;
+        const { x: prevX, y: prevY } = this.state.prevPos;
         const position = this.el.getAttribute('position');
         this.el.setAttribute('position', {
             x: position.x + (x - prevX) * this.data.moveSpeed,
             y: position.y + (y - prevY) * this.data.moveSpeed,
             z: position.z
         });
-        this.state.prevPos = {x, y};
+        this.state.prevPos = { x, y };
     },
     handleTouchStart: function (e) {
         if (e.touches.length === 1) {
-            this.setState('moving', {x: e.touches[0].clientX, y: e.touches[0].clientY});
+            this.setState('rotating', { x: e.touches[0].clientX, y: e.touches[0].clientY });
         } else if (e.touches.length === 2) {
             this.state.zooming = true;
             this.state.initDist = this.getTouchDistance(e.touches);
         }
     },
     handleTouchMove: function (e) {
-        if (e.touches.length === 1 && this.state.moving) {
-            this.move(e.touches[0].clientX, e.touches[0].clientY);
+        if (e.touches.length === 1 && this.state.rotating) {
+            this.handleInteraction(e.touches[0].clientX, e.touches[0].clientY, 'rotate');
         } else if (e.touches.length === 2 && this.state.zooming) {
             const dist = this.getTouchDistance(e.touches);
             this.zoom((dist - this.state.initDist) * this.data.zoomSpeed);
             this.state.initDist = dist;
+        } else if (e.touches.length === 1 && this.state.moving) {
+            this.move(e.touches[0].clientX, e.touches[0].clientY);
         }
     },
-    getTouchDistance: function ([t1, t2]) {
-        return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+    getTouchDistance: function (touches) {
+        const [t1, t2] = touches;
+        return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
     },
     zoom: function (delta) {
         const newScale = Math.min(
@@ -100,7 +95,7 @@ AFRAME.registerComponent('interaction-handler', {
         );
         if (newScale !== this.state.scale) {
             this.state.scale = newScale;
-            this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
+            this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`);
         }
     }
 });

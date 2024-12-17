@@ -88,6 +88,17 @@ AFRAME.registerComponent('interaction-handler', {
         });
         this.state.prevPos = {x, y}; // Actualizar la posición previa
     },
+    // Función para realizar zoom del modelo 3D
+    zoom: function (delta) {
+        const newScale = Math.min(
+            Math.max(this.state.scale + delta * this.data.zoomSpeed, this.data.minScale),
+            this.data.maxScale
+        );
+        if (newScale !== this.state.scale) {
+            this.state.scale = newScale;
+            this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
+        }
+    },
     // Manejar inicio de interacciones táctiles (rotación o zoom)
     handleTouchStart: function (e) {
         if (e.touches.length === 1) { // Un dedo: modo rotación movimiento
@@ -111,16 +122,5 @@ AFRAME.registerComponent('interaction-handler', {
     // Calcular la distancia entre los puntos de contacto
     getTouchDistance: function ([t1, t2]) {
         return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY); // Obtener las posiciones táctiles y calcular la distancia entre las posiciones
-    },
-    // Función para realizar zoom del modelo 3D
-    zoom: function (delta) {
-        const newScale = Math.min(
-            Math.max(this.state.scale + delta * this.data.zoomSpeed, this.data.minScale),
-            this.data.maxScale
-        );
-        if (newScale !== this.state.scale) {
-            this.state.scale = newScale;
-            this.el.setAttribute('scale', `${newScale} ${newScale} ${newScale}`)
-        }
     }
 });

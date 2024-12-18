@@ -13,20 +13,21 @@ AFRAME.registerComponent('interaction-handler', {
             moving: false,
             prevPos: {},
             initDist: 0,
-            scale: this.data.minScale
+            scale: this.data.minScale,
+            lastClickTime: 0 // Para detectar el doble click
         };
         this.bindEvents();
     },
     bindEvents: function () {
         const sceneEl = this.el.sceneEl;
         const events = {
-            mousemove: e => this.handleInteraction(e.clientX, e.clientY, 'rotate'),
-            mousedown: e => this.setState('rotating', { x: e.clientX, y: e.clientY }),
-            mouseup: () => this.resetState(),
-            touchstart: e => this.handleTouchStart(e),
-            touchmove: e => this.handleTouchMove(e),
-            touchend: () => this.resetState(),
-            wheel: e => this.zoom(e.deltaY * -1)
+            mousemove: e => this.handleInteraction(e.clientX, e.clientY, 'rotate'), // Manejar rotación con el mouse
+            mousedown: e => this.startInteraction(e.clientX, e.clientY, 'mouse'), // Iniciar rotación o movimiento con el mouse
+            mouseup: () => this.resetState(), // Finalizar rotación o movimiento
+            touchstart: e => this.handleTouchStart(e), // Manejar inicio de toques
+            touchmove: e => this.handleTouchMove(e), // Manejar movimientos táctiles
+            touchend: () => this.resetState(), // Reiniciar estado al soltar los toques
+            wheel: e => this.zoom(e.deltaY * -1) // Manejar zoom con la rueda del mouse
         };
         Object.entries(events).forEach(([type, handler]) => sceneEl.addEventListener(type, handler));
     },
@@ -38,6 +39,17 @@ AFRAME.registerComponent('interaction-handler', {
         this.setState('rotating', false);
         this.setState('zooming', false);
         this.setState('moving', false);
+    },
+    startInteraction: function (x, y, mode) {
+        const currentTime = new Date().getTime();
+        const timeDifference = currentTime - this.state.lastClickTime;
+        this.state.lastClickTime = currentTime;
+
+        if (timeDifference < 300) {
+            this.setState('rotating', true); // Doble clic para rotar
+        } else {
+            this.setState('moving', { x, y }); // Click simple para mover
+        }
     },
     handleInteraction: function (x, y, mode) {
         if (mode === 'rotate' && !this.state.rotating) return;
@@ -71,23 +83,15 @@ AFRAME.registerComponent('interaction-handler', {
         } else if (e.touches.length === 2) {
             this.state.zooming = true;
             this.state.initDist = this.getTouchDistance(e.touches);
-        } else if (e.touches.length === 3) { // Tres dedos: modo movimiento
-            this.setState('moving', true);
-            this.state.prevPos = {
-                x: e.touches[0].clientX,
-                y: e.touches[0].clientY
-            };
         }
     },
     handleTouchMove: function (e) {
-        if (e.touches.length === 1 && this.state.rotating) {
+        if (e.touches.length === 1) {
             this.handleInteraction(e.touches[0].clientX, e.touches[0].clientY, 'rotate');
         } else if (e.touches.length === 2 && this.state.zooming) {
             const dist = this.getTouchDistance(e.touches);
             this.zoom((dist - this.state.initDist) * this.data.zoomSpeed);
             this.state.initDist = dist;
-        } else if (e.touches.length === 3 && this.state.moving) {
-            this.move(e.touches[0].clientX, e.touches[0].clientY);
         }
     },
     getTouchDistance: function (touches) {
